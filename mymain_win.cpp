@@ -20,7 +20,7 @@ MyMain_win::MyMain_win(QWidget *parent)
     init_Page_PathChoose();
     init_Page_PathCheck();
     init_Page_CityCheck();
-    connect(ui->Check_pushButton,SIGNAL(&QPushButton::click),this,SLOT(on_Check_pushButton_clicked()));
+
 
 }
 
@@ -109,6 +109,7 @@ void MyMain_win::init_Page_PathChoose(){
     ui->PathChoose_Table->setEditTriggers(QAbstractItemView::NoEditTriggers);   //禁止修改
     ui->PathChoose_Table->setSelectionMode(QAbstractItemView::SingleSelection);  //设置为可以选中单个
     ui->PathChoose_Table->verticalHeader()->setVisible(true);   //隐藏列表头
+    connect(ui->Check_pushButton,SIGNAL(&QPushButton::click),this,SLOT(on_Check_pushButton_clicked()));
     //ui->PathChoose_Table->setRowCount(2);
     //QComboBox *tmpcomBox = new QComboBox();
     //tmpcomBox->addItem("Y");

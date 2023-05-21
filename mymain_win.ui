@@ -36,7 +36,7 @@
      </size>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="main_page">
      <property name="minimumSize">
@@ -762,7 +762,7 @@ QPushButton:pressed
        <string>返回</string>
       </property>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>270</x>
