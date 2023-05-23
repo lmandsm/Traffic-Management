@@ -20,6 +20,14 @@ MyMain_win::MyMain_win(QWidget *parent)
     init_Page_PathChoose();
     init_Page_PathCheck();
     init_Page_CityCheck();
+    //导入初始化城市和路径
+    Train_graph.addCityFromFile("D:\\App\\Qt\\project\\TrafficManagement\\train_city.txt");
+    Train_graph.addLineFromFile("D:\\App\\Qt\\project\\TrafficManagement\\train_line.txt");
+    //初始化中转时间
+    Train_graph.Transit_time = 60;
+    //    Plane_graph.addCityFromFile("plane_city.txt");
+    //    Plane_graph.addLineFromFile("plane_city.txt");
+    Plane_graph.Transit_time = 120;
 
 
 }
@@ -42,6 +50,10 @@ void MyMain_win::switchPage(){
 }
 void MyMain_win::init_Page_PathChoose(){
     //路径选择widget设置
+
+    //初始化变量
+    PreferChoice = 0;
+    choose_transportation = "飞机";
 
     //交通工具选择
     ui->Way_comboBox->addItem("飞机");
@@ -117,12 +129,49 @@ void MyMain_win::init_Page_PathChoose(){
     //ui->PathChoose_Table->setCellWidget(0,0,tmpcomBox);
     //connect(ui->Check_pushButton,&QPushButton::clicked,this,&MyMain_win::on_Check_pushButton_clicked);
 
+    //结果显示Label初始化
+    ui->PathCheckReslabel->setText("该路线 共中转 0 次，总用时：0 天 0 小时 0 分，总花费 ：0 元");
+
 }
 void MyMain_win::init_Page_PathCheck(){
 
+    //初始化选择查看方式
+        //按钮初始化,绑定信号和槽函数
+    PathCheckGroupButton=new QButtonGroup(this);
+    PathCheckGroupButton->addButton(ui->Choose_Plane_radioButton,0);
+    PathCheckGroupButton->addButton(ui->Choose_Train_radioButton,1);
+    //ui->Choose_Plane_radioButton->setChecked(true);//默认查看飞机航班
+    //connect(ui->SearchPath_pushButton,SIGNAL(&QPushButton::click),this,SLOT(on_SearchPath_pushButton_clicked()));//这里的信号不能用SIGNAL(click(bool)),这样会同时执行两次槽函数
+    connect(ui->Choose_Plane_radioButton,SIGNAL(&QPushButton::click),this,SLOT(on_Choose_Plane_radioButton_clicked()));
+    connect(ui->Choose_Train_radioButton,SIGNAL(&QPushButton::click),this,SLOT(on_Choose_Train_radioButton_clicked()));
+
+    //查看表格初始化
+    ui->PathCheck_Table->setColumnCount(6);
+        //表格表头：车次，起始站，终点站，出发时间，到站时间，耗时,花销
+    QStringList tmpheader;
+    tmpheader<<"班次"<<"起始站"<<"终点站"<<"出发时间"<<"到达时间"<<"旅费";
+    ui->PathCheck_Table->setHorizontalHeaderLabels(tmpheader);
+    ui->PathCheck_Table->setSelectionBehavior(QAbstractItemView::SelectRows);  //整行选中的方式
+    ui->PathCheck_Table->setEditTriggers(QAbstractItemView::NoEditTriggers);   //禁止修改
+    ui->PathCheck_Table->setSelectionMode(QAbstractItemView::SingleSelection);  //设置为可以选中单个
+    ui->PathCheck_Table->verticalHeader()->setVisible(true);   //隐藏列表头
+
 }
 void MyMain_win::init_Page_CityCheck(){
+    //查看表格初始化
+    ui->CityCheck_Table->setColumnCount(1);
+        //表格表头：城市名
+    QStringList tmpheader;
+    tmpheader<<"城市名";
+    ui->CityCheck_Table->setHorizontalHeaderLabels(tmpheader);
+    ui->CityCheck_Table->setSelectionBehavior(QAbstractItemView::SelectRows);  //整行选中的方式
+    ui->CityCheck_Table->setEditTriggers(QAbstractItemView::NoEditTriggers);   //禁止修改
+    ui->CityCheck_Table->setSelectionMode(QAbstractItemView::SingleSelection);  //设置为可以选中单个
+    ui->CityCheck_Table->verticalHeader()->setVisible(true);   //隐藏列表头
 
+    //初始化按钮
+    connect(ui->CitySearch_pushButton,SIGNAL(&QPushButton::click),this,SLOT(on_CitySearch_pushButton_clicked()));
+    connect(ui->City_Add_pushButton,SIGNAL(&QPushButton::click),this,SLOT(on_City_Add_pushButton_clicked()));
 }
 
 void MyMain_win::save_transportation()
@@ -176,16 +225,72 @@ void MyMain_win::save_choose_min()
     //qDebug()<<choose_day;
 }
 
+//页面pathCheck:查询路径函数
 void MyMain_win::on_Check_pushButton_clicked()
 {
-    ALGraph a;
+
+
     struct Time tmpSt(choose_month.toInt(),choose_day.toInt(),choose_hour.toInt(),choose_min.toInt());
-    if(PreferChoice==0){//耗时短
-        a.printLeastTimePath(ui->PathChoose_Table,choose_src.toStdString(),choose_des.toStdString(),tmpSt.getTotalMinute());
-    }else if (PreferChoice==1){ //花费少
-        a.printLeastMoneyPath(ui->PathChoose_Table,choose_src.toStdString(),choose_des.toStdString(),tmpSt.getTotalMinute());
-    }else if(PreferChoice==2){//中转少
-        a.printLeastTransferPath(ui->PathChoose_Table,choose_src.toStdString(),choose_des.toStdString(),tmpSt.getTotalMinute());
+    if( choose_transportation == "火车"){
+        if(PreferChoice==0){//耗时短
+            Train_graph.printLeastTimePath(ui->PathChoose_Table,ui->PathCheckReslabel,choose_src.toStdString(),choose_des.toStdString(),tmpSt.getTotalMinute());
+        }else if (PreferChoice==1){ //花费少
+            Train_graph.printLeastMoneyPath(ui->PathChoose_Table,ui->PathCheckReslabel,choose_src.toStdString(),choose_des.toStdString(),tmpSt.getTotalMinute());
+        }else if(PreferChoice==2){//中转少
+            Train_graph.printLeastTransferPath(ui->PathChoose_Table,ui->PathCheckReslabel,choose_src.toStdString(),choose_des.toStdString(),tmpSt.getTotalMinute());
+        }
     }
+    else{
+        if(PreferChoice==0){//耗时短
+            Plane_graph.printLeastTimePath(ui->PathChoose_Table,ui->PathCheckReslabel,choose_src.toStdString(),choose_des.toStdString(),tmpSt.getTotalMinute());
+        }else if (PreferChoice==1){ //花费少
+            Plane_graph.printLeastMoneyPath(ui->PathChoose_Table,ui->PathCheckReslabel,choose_src.toStdString(),choose_des.toStdString(),tmpSt.getTotalMinute());
+        }else if(PreferChoice==2){//中转少
+            Plane_graph.printLeastTransferPath(ui->PathChoose_Table,ui->PathCheckReslabel,choose_src.toStdString(),choose_des.toStdString(),tmpSt.getTotalMinute());
+        }
+    }
+}
+
+
+void MyMain_win::receiveCityInf(string CityName){
+    Train_graph.addCity(CityName);
+    Plane_graph.addCity(CityName);
+}
+
+void MyMain_win::on_City_Add_pushButton_clicked()
+{
+    CityEdit *v;
+    v=new CityEdit();
+    v->show();
+    connect(v,SIGNAL(sendCityInf(string)),this,SLOT(receiveCityInf(string)));
+}
+
+
+
+
+
+
+
+void MyMain_win::on_City_Del_pushButton_clicked()
+{
+
+}
+
+
+void MyMain_win::on_Choose_Plane_radioButton_clicked()
+{
+    Plane_graph.showAllLine(ui->PathCheck_Table);
+}
+
+
+void MyMain_win::on_Choose_Train_radioButton_clicked()
+{
+    Train_graph.showAllLine(ui->PathCheck_Table);
+}
+
+
+void MyMain_win::on_CitySearch_pushButton_clicked()
+{
+    Train_graph.showAllCity();
 }
 

@@ -10,16 +10,22 @@ CONFIG += c++17
 
 SOURCES += \
     ALGraph.cpp \
+    cityedit.cpp \
     main.cpp \
-    mymain_win.cpp
+    mymain_win.cpp \
+    pathedit.cpp
 
 HEADERS += \
     ALGraph.h \
     C:/Users/laomahecx/Documents/Tencent Files/1759440214/FileRecv/ALGraph.h \
-    mymain_win.h
+    cityedit.h \
+    mymain_win.h \
+    pathedit.h
 
 FORMS += \
-    mymain_win.ui
+    cityedit.ui \
+    mymain_win.ui \
+    pathedit.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -29,3 +35,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 #win32-msvc* {
 #    QMAKE_CXXFLAGS += /source-charset:utf-8 /execution-charset:utf-8
 #}
+
+DISTFILES += \
+    train_city.txt \
+    train_line.txt

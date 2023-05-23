@@ -11,7 +11,10 @@
 #include<QString>
 #include <QHeaderView>
 #include<QMessageBox>
+#include<QButtonGroup>
 #include<ALGraph.h>
+#include<cityedit.h>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MyMain_win; }
@@ -38,13 +41,21 @@ private slots:
     void save_choose_hour();
     void save_choose_min();
     void on_Check_pushButton_clicked();
+    void receiveCityInf(string CityName);
+    void on_City_Add_pushButton_clicked();
+    void on_City_Del_pushButton_clicked();
+
+    void on_Choose_Plane_radioButton_clicked();
+    void on_Choose_Train_radioButton_clicked();
+
+    void on_CitySearch_pushButton_clicked();
 
 private:
     Ui::MyMain_win *ui;
     QString choose_transportation;
     QString choose_src;
     QString choose_des;
-    bool PreferChoice;
+    int PreferChoice;
     QString choose_month;
     QString choose_day;
     QString choose_hour;
@@ -57,6 +68,8 @@ private:
     QStringList dayList;
     QStringList hourList;
     QStringList minList;
+    QButtonGroup *PathCheckGroupButton;
+    ALGraph Train_graph,Plane_graph;
     //QStringList dayl
 
 };

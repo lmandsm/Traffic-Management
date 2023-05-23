@@ -33,8 +33,6 @@ using std::make_pair;
 
 //using std::vector;
 
-
-
 // Time 对象的"<"重载，实现两个 Time 对象的比较
 bool operator > (Time t1, Time t2) {
     return t1.getTotalMinute() > t2.getTotalMinute();
@@ -54,7 +52,6 @@ bool ALGraph::ifCityExist(const std::string& city_name) {
 bool ALGraph::check_sc_and_ec(const std::string& sc, const std::string& ec) {
     QString tmp;
     if ((!ifCityExist(sc)) && (!ifCityExist(ec))) {
-        //cout << "系统中未存在" << sc << "和" << ec << "这两座城市，请先添加这两座城市！" << endl;
         tmp="系统未存在"+QString::fromStdString(sc)+"和"+QString::fromStdString(ec)+"这两座城市，请先添加这两座城市！";
         QMessageBox::warning(nullptr,"错误",tmp);
         return 0;
@@ -71,6 +68,14 @@ bool ALGraph::check_sc_and_ec(const std::string& sc, const std::string& ec) {
         QMessageBox::warning(nullptr,"错误",tmp);
         return 0;
     }
+
+
+    if (sc == ec) {
+        tmp="起点和终点不能相同";
+        QMessageBox::warning(nullptr,"错误",tmp);
+        return 0;
+    }
+
     return  1;
 }
 
@@ -79,7 +84,7 @@ bool ALGraph::check_sc_and_ec(const std::string& sc, const std::string& ec) {
 void ALGraph::addCity(const string& city_name) {
 
     if (ifCityExist(city_name)) {
-        cout << "该城市已经存在，无需重复添加！" << endl;
+        QMessageBox::critical(nullptr,"提醒","该城市已经存在，无需重复添加！");
         return;
     }
     vector<LineNode> tmp = {};
@@ -88,28 +93,27 @@ void ALGraph::addCity(const string& city_name) {
 
 
 // 从文件中读取以添加城市
-void ALGraph::addCityFromFile(const char FILENAME[MAXFILESIZE]) {
+void ALGraph::addCityFromFile(const string& FILENAME) {
 
-
-    cout << "不会说中文？？" << endl;
-    cout << "开始从" << FILENAME << "中读入并添加城市！" << endl;
-
-    ifstream file(FILENAME);  // 打开失败返回NULL
-    if (!file) {
-        cout << "打开文件失败！" << endl;
+    ifstream infile;  // 打开失败返回NULL
+    infile.open(FILENAME, std::ios::in);
+    if (!infile.is_open()) {
+        qDebug() << "打开文件失败!" << endl;
         return;
     }
 
+    string catalogue; //存储第一行的目录
+    getline(infile, catalogue);
     // 读取城市名
     string line;
-    while (getline(file, line)) {
+    while (getline(infile, line)) {
         istringstream istr(line);  // 利用 istringstream 类直接将 string 输入到 name
         string name;
         istr >> name;
         addCity(name);
     }
-    cout << "城市导入完毕，当前系统中有" << m.size() << "个城市！" << endl;
-    file.close();  // 读取后关闭文件
+    qDebug() << "城市导入完毕，当前系统中有" << m.size() << "个城市！" << endl;
+    infile.close();  // 读取后关闭文件
 }//addCityFromFile
 
 
@@ -154,8 +158,8 @@ void ALGraph::addLine() {
 
 
 //从文件中读取以添加线路
-void ALGraph::addLineFromFile(const char FILENAME[MAXFILESIZE]) {
-    cout << "从" << FILENAME << "中读取并导入线路！" << endl;
+void ALGraph::addLineFromFile(const std::string& FILENAME) {
+
     ifstream file(FILENAME);
     if (!file) {
         cout << "打开文件" << FILENAME << "失败！" << endl;;
@@ -185,6 +189,7 @@ void ALGraph::addLineFromFile(const char FILENAME[MAXFILESIZE]) {
             mp.insert({ line_number,LineNode(vehicle, line_number, start_city_name, end_city_name, start_time, end_time,spend_money) });
         }
     }
+    qDebug()<<"路线导入完成！"<<endl;
     file.close(); //打开存储线路的文件完毕，关闭file
 }//addLineFromFile
 
@@ -235,41 +240,59 @@ void ALGraph::delLine(const string& line_number) {
 }
 
 //输出所有城市
-void ALGraph::showAllCity() {
-    if (m.size() == 0) {
-        cout << "没有城市" << endl;
-    }
-    else {
-        for (auto i : m) {
-            cout << i.first << " ";
+void ALGraph::showAllCity(QTableWidget *parent) {
+    if(parent->rowCount()>0){
+        for(int rn=parent->rowCount();rn>=0;--rn){
+            parent->removeRow(rn);
         }
     }
-}//showAllCity
-
-//显示所有班次
-void ALGraph::showAllLine() {
-
-    if (mp.size() == 0) {
-        cout << "系统中没有任何线路的信息！" << endl;
-        return;
+    parent->setRowCount(m.size());
+    int ri = 0;
+    for(auto city: m){
+        parent->setItem(ri,0,new QTableWidgetItem(QString::fromStdString(city.first)));
+        ri++;
     }
-    else {
-        cout << "系统当前一共有 " << mp.size() << " 条线路的信息！" << endl;
-    }
-    auto it = m.cbegin();
-    while (it != m.cend()) {
-        for (auto beg = (*it).second.cbegin(); beg != (*it).second.cend(); ++beg) {
-            cout << (*beg).line_number;
+
+}
+
+
+void ALGraph::showAllLine(QTableWidget *parent) {
+    if(parent->rowCount()>0){
+        for(int rn=parent->rowCount();rn>=0;--rn){
+            parent->removeRow(rn);
         }
-        ++it;
+    }
+
+    parent->setRowCount(mp.size());
+    int ri=0;
+    for(auto adj: m){
+
+        for(auto ir = adj.second.begin();ir != adj.second.end(); ir++){
+            QString st=QString::number(ir->start_time.month)+"月"+QString::number(ir->start_time.day)+"日 "+QString::number(ir->start_time.hour)+':'+(ir->start_time.minute<10 ? "0":"")+QString::number(ir->start_time.minute);
+            QString et=QString::number(ir->end_time.month)+"月"+QString::number(ir->end_time.day)+"日 "+QString::number(ir->end_time.hour)+':'+(ir->end_time.minute<10 ? "0":"")+QString::number(ir->end_time.minute);
+
+            parent->setItem(ri,0,new QTableWidgetItem(QString::fromStdString(ir->line_number)));
+            parent->setItem(ri,1,new QTableWidgetItem(QString::fromStdString(ir->start_city_name)));
+            parent->setItem(ri,2,new QTableWidgetItem(QString::fromStdString(ir->end_city_name)));
+            parent->setItem(ri,3,new QTableWidgetItem(st));
+            parent->setItem(ri,4,new QTableWidgetItem(et));
+            parent->setItem(ri,5,new QTableWidgetItem(QString::number(ir->spend_money), 2));
+            ri++;
+        }
     }
 }  // showAllLine
 
 
-// 输出从起点城市到终点城市，中转次数最少的路径
-    void ALGraph::printLeastTransferPath(QTableWidget *parent, const std::string& sc, const std::string& ec, const int st_time) {
 
-    if (!check_sc_and_ec(sc, ec)){QMessageBox::critical(parent,"错误","抱歉,不存在对应路线") ;return;}
+// 输出从起点城市到终点城
+void ALGraph::printLeastTransferPath(QTableWidget *parent, QLabel *ResShow,const std::string& sc, const std::string& ec, const int st_time) {
+    if(parent->rowCount()>0){
+        for(int rn=parent->rowCount();rn>=0;--rn){
+            parent->removeRow(rn);
+        }
+    }
+
+    if (!check_sc_and_ec(sc, ec)){return;}
 
     map<string, int> dis; //计入中转次数
     map<string, string> pre; // 城市 -> 班次
@@ -278,12 +301,16 @@ void ALGraph::showAllLine() {
     struct reach_node {
         int r_time;  //到达时间
         int cost;  //中转次数
+        bool state;
         string line_num; //编号
         bool operator < (const reach_node& x) const {
             if (r_time == x.r_time) {
-                return cost < x.cost;
+                if(state == x.state){
+                    return cost > x.cost;
+                }
+                return state < x.state;
             }
-            return r_time < x.r_time;
+            return r_time > x.r_time;
         }
     };
 
@@ -291,7 +318,7 @@ void ALGraph::showAllLine() {
 
     auto m_iter = m.cbegin();
     while (m_iter != m.cend()) {
-        dis.insert({ (*m_iter).first, INT_MAX });
+        dis.insert({ (*m_iter).first, INF});
         ++m_iter;
     }
 
@@ -304,24 +331,22 @@ void ALGraph::showAllLine() {
 
     for (auto lnd : mp) {
         if (lnd.second.start_time.getTotalMinute() > st_time) {
-            pq.push({ lnd.second.start_time.getTotalMinute(),0,lnd.first });
+            pq.push({ lnd.second.start_time.getTotalMinute(),0,0,lnd.first });
         }
     }
 
     while (!pq.empty()) {
-        int now_time = pq.top().r_time;
+        int now_state = pq.top().state;
         int now_cost = pq.top().cost;
         string line_num = pq.top().line_num;
         pq.pop();
 
         string now_city = mp[line_num].start_city_name, nxt_city = mp[line_num].end_city_name;
 
-        if (now_time == mp[line_num].start_time.getTotalMinute()) {
-            pq.push({ mp[line_num].end_time.getTotalMinute(),dis[now_city] + 1, line_num });//保存到达时间的价钱
+        if (now_state == 0) {
+            pq.push({ mp[line_num].end_time.getTotalMinute()+Transit_time,dis[now_city] + 1, 1,line_num });//保存到达时间的价钱
         }
         else {
-            pre[nxt_city] = now_city;
-
             if (nxt_city == ec && now_cost < dis[nxt_city]) {
                 result = { line_num };
                 while (now_city != sc) {
@@ -330,6 +355,7 @@ void ALGraph::showAllLine() {
                 }
             }
 
+            if(now_cost < dis[nxt_city]) pre[nxt_city] = line_num,dis[nxt_city] = now_cost;
         }
     }
 
@@ -338,46 +364,51 @@ void ALGraph::showAllLine() {
     }
     else {
         std::reverse(result.begin(), result.end());
-        //for (auto lnd : result) {
-        //    cout << mp[lnd].line_number << " " << endl;
-        //}
-
-        //每次加载数据前清空表格数据
-        if(parent->rowCount()>0){
-            for(int rn=parent->rowCount();rn>=parent->rowCount();--rn){
-                parent->removeRow(rn);
-            }
-        }
 
         //打印数据
         parent->setRowCount(result.size());
         int ri=0;
+        int CostTime=0;
+        float Money=0;
         //vector<LineNode>::iterator iter= result.begin();
         for(auto lnd:result){
-            QString st=QString::number(mp[lnd].start_time.month)+'/'+QString::number(mp[lnd].start_time.day)+'/'+QString::number(mp[lnd].start_time.hour)+'/'+QString::number(mp[lnd].start_time.minute);
-            QString et=QString::number(mp[lnd].end_time.month)+'/'+QString::number(mp[lnd].end_time.day)+'/'+QString::number(mp[lnd].end_time.hour)+'/'+QString::number(mp[lnd].end_time.minute);
+            QString st=QString::number(mp[lnd].start_time.month)+"月"+QString::number(mp[lnd].start_time.day)+"日 "+QString::number(mp[lnd].start_time.hour)+':'+(mp[lnd].start_time.minute<10 ? "0":"")+QString::number(mp[lnd].start_time.minute);
+            QString et=QString::number(mp[lnd].end_time.month)+"月"+QString::number(mp[lnd].end_time.day)+"日 "+QString::number(mp[lnd].end_time.hour)+':'+(mp[lnd].end_time.minute<10 ? "0":"")+QString::number(mp[lnd].end_time.minute);
 
             parent->setItem(ri,0,new QTableWidgetItem(QString::fromStdString(mp[lnd].line_number)));
             parent->setItem(ri,1,new QTableWidgetItem(QString::fromStdString(mp[lnd].start_city_name)));
             parent->setItem(ri,2,new QTableWidgetItem(QString::fromStdString(mp[lnd].end_city_name)));
             parent->setItem(ri,3,new QTableWidgetItem(st));
             parent->setItem(ri,4,new QTableWidgetItem(et));
-            parent->setItem(ri,5,new QTableWidgetItem(mp[lnd].spend_money));
+            parent->setItem(ri,5,new QTableWidgetItem(QString::number(mp[lnd].spend_money), 2));
+
             ri++;
+            Money+=mp[lnd].spend_money;
         }
+        CostTime=mp[result.back()].end_time.getTotalMinute()-mp[result.front()].start_time.getTotalMinute();
+        int tmpday=CostTime/1440;
+        int tmphour=(CostTime-tmpday*1440)/60;
+        int tmpminute=CostTime%60;
+        QString res="该路线 共中转 "+QString::number(ri-1)+" 次，总用时："+QString::number(tmpday)+" 天 "+QString::number(tmphour)+" 小时 "+QString::number(tmpminute)+" 分，总花费 ："+QString::number(Money)+" 元";
+        ResShow->setText(res);
     }
+
 }
 
 // 输出从起点城市到终点城市，总时间最短的线路
-void ALGraph::printLeastTimePath(QTableWidget *parent, const std::string& sc, const std::string& ec, const int st_time) {
+void ALGraph::printLeastTimePath(QTableWidget *parent,QLabel *ResShow, const std::string& sc, const std::string& ec, const int st_time) {
+    if(parent->rowCount()>0){
+        for(int rn=parent->rowCount();rn>=0;--rn){
+            parent->removeRow(rn);
+        }
+    }
 
-
-    if (!check_sc_and_ec(sc, ec)){QMessageBox::critical(parent,"错误","抱歉,不存在对应路线") ;return;}
+    if (!check_sc_and_ec(sc, ec)){return;}
 
     set<string> visited;
     map<string, int> reach_time;
     map<string, string> pre; // 城市 -> 班次
-    vector<LineNode> result;  // 存储最终要打印的路径
+    vector<string> result;  // 存储最终要打印的路径
 
     struct reach_node {
         string city;
@@ -412,16 +443,17 @@ void ALGraph::printLeastTimePath(QTableWidget *parent, const std::string& sc, co
         visited.insert(x.city);
 
         int current_time = reach_time[x.city];
+        if(x.city != sc) current_time += Transit_time; // 如果不是起点城市，那么在到达时间上加上中转，确保有足够时间中转
 
         vector<LineNode> adj = m[x.city];
 
-        for (auto r = adj.cbegin(); r <= adj.cend(); r++) {
 
-            if (current_time < r->start_time.getTotalMinute() && reach_time[r->end_city_name] < r->end_time.getTotalMinute()) {
+        for (auto r = adj.begin(); r != adj.end(); r++) {
+
+            if (current_time <= r->start_time.getTotalMinute() && reach_time[r->end_city_name]  > r->end_time.getTotalMinute()) {
                 reach_time[r->end_city_name] = r->end_time.getTotalMinute();
-
                 q.push({ r->end_city_name,reach_time[r->end_city_name] });
-                pre[r->end_city_name] = { r->line_number };
+                pre[r->end_city_name] = r->line_number;
             }
 
         }
@@ -433,142 +465,157 @@ void ALGraph::printLeastTimePath(QTableWidget *parent, const std::string& sc, co
     else {
         string now_city = ec;
         while (now_city != sc) {
-            result.push_back(mp[pre[now_city]]);
+            result.push_back(mp[pre[now_city]].line_number);
             now_city = mp[pre[now_city]].start_city_name;
         }
         std::reverse(result.begin(), result.end());
 
         //每次加载数据前清空表格数据
-        if(parent->rowCount()>0){
-            for(int rn=parent->rowCount();rn>=parent->rowCount();--rn){
-                parent->removeRow(rn);
-            }
-        }
 
         //打印数据
         parent->setRowCount(result.size());
         int ri=0;
-        //for(auto lnd:result){
-        //    QString st=QString::number(mp[lnd].start_time.month)+'/'+QString::number(mp[lnd].start_time.day)+'/'+QString::number(mp[lnd].start_time.hour)+'/'+QString::number(mp[lnd].start_time.minute);
-        //    QString et=QString::number(mp[lnd].end_time.month)+'/'+QString::number(mp[lnd].end_time.day)+'/'+QString::number(mp[lnd].end_time.hour)+'/'+QString::number(mp[lnd].end_time.minute);
+        int CostTime=0;
+        float Money=0;
+        //vector<LineNode>::iterator iter= result.begin();
+        for(auto lnd:result){
+            QString st=QString::number(mp[lnd].start_time.month)+"月"+QString::number(mp[lnd].start_time.day)+"日 "+QString::number(mp[lnd].start_time.hour)+':'+(mp[lnd].start_time.minute<10 ? "0":"")+QString::number(mp[lnd].start_time.minute);
+            QString et=QString::number(mp[lnd].end_time.month)+"月"+QString::number(mp[lnd].end_time.day)+"日 "+QString::number(mp[lnd].end_time.hour)+':'+(mp[lnd].end_time.minute<10 ? "0":"")+QString::number(mp[lnd].end_time.minute);
 
-        //    parent->setItem(ri,0,new QTableWidgetItem(QString::fromStdString(mp[lnd].line_number)));
-        //    parent->setItem(ri,1,new QTableWidgetItem(QString::fromStdString(mp[lnd].start_city_name)));
-        //    parent->setItem(ri,2,new QTableWidgetItem(QString::fromStdString(mp[lnd].end_city_name)));
-        //    parent->setItem(ri,3,new QTableWidgetItem(st));
-        //    parent->setItem(ri,4,new QTableWidgetItem(et));
-        //    parent->setItem(ri,5,new QTableWidgetItem(mp[lnd].spend_money));
-        //    ri++;
-        //}
+            parent->setItem(ri,0,new QTableWidgetItem(QString::fromStdString(mp[lnd].line_number)));
+            parent->setItem(ri,1,new QTableWidgetItem(QString::fromStdString(mp[lnd].start_city_name)));
+            parent->setItem(ri,2,new QTableWidgetItem(QString::fromStdString(mp[lnd].end_city_name)));
+            parent->setItem(ri,3,new QTableWidgetItem(st));
+            parent->setItem(ri,4,new QTableWidgetItem(et));
+            parent->setItem(ri,5,new QTableWidgetItem(QString::number(mp[lnd].spend_money), 2));
+            ri++;
+            Money+=mp[lnd].spend_money;
+        }
+        CostTime=mp[result.back()].end_time.getTotalMinute()-mp[result.front()].start_time.getTotalMinute();
+        int tmpday=CostTime/1440;
+        int tmphour=(CostTime-tmpday*1440)/60;
+        int tmpminute=CostTime%60;
+        QString res="该路线 共中转 "+QString::number(ri-1)+" 次，总用时："+QString::number(tmpday)+" 天 "+QString::number(tmphour)+" 小时 "+QString::number(tmpminute)+" 分，总花费 ："+QString::number(Money)+" 元";
+        ResShow->setText(res);
 
     }
 
 }
 
 // 输出某个城市到其他各城市的花费最少的路线
-    void ALGraph::printLeastMoneyPath(QTableWidget *parent,  const std::string& sc, const std::string& ec, const int st_time) {
+void ALGraph::printLeastMoneyPath(QTableWidget *parent, QLabel *ResShow, const std::string& sc, const std::string& ec, const int st_time) {
+    if(parent->rowCount()>0){
+        for(int rn=parent->rowCount();rn>=0;--rn){
+            parent->removeRow(rn);
+        }
+    }
 
-    if (!check_sc_and_ec(sc, ec)) {QMessageBox::critical(parent,"错误","抱歉，未查询查询到对应路线！") ;return;}
+    if (!check_sc_and_ec(sc, ec)) {return;}
            //MinCostFail=true;
-        map<string, double> dis; //计入费用
-        map<string, string> pre; // 城市 -> 班次
-        vector<string> result;  // 存储最终要打印的路径的班次
+    map<string, double> dis; //计入费用
+    map<string, string> pre; // 城市 -> 班次
+    vector<string> result;  // 存储最终要打印的路径的班次
 
-        struct reach_node {
-            int r_time;  //到达时间
-            double cost;
-            string line_num; //编号
-            bool operator < (const reach_node& x) const {
-                if (r_time == x.r_time) {
-                    return cost < x.cost;
+    struct reach_node {
+        int r_time;  //到达时间 根据时间维护事件
+        double cost;
+        bool state; //描述状态，待出发还是已到达，如果时间相同，我们应该先维护到达的车次去更新站点的最小费用
+        string line_num; //编号
+        bool operator < (const reach_node& x) const {
+            if (r_time == x.r_time) {
+                if(state == x.state){
+                    return cost > x.cost;
                 }
-                return r_time < x.r_time;
+                return state < x.state;
             }
-        };
-
-        std::priority_queue<reach_node, vector<reach_node>> pq;
-
-        auto m_iter = m.cbegin();
-        while (m_iter != m.cend()) {
-            dis.insert({ (*m_iter).first, INT_MAX });
-            ++m_iter;
+            return r_time > x.r_time;
         }
+    };
 
-        // 初始化 distanced 中起点城市的信息
-        auto _dist_iter = dis.find(sc);
-        if (_dist_iter != dis.end()) {
-            (*_dist_iter).second = 0; //起点站费用为零
+    std::priority_queue<reach_node, vector<reach_node>> pq;
+
+    auto m_iter = m.cbegin();
+    while (m_iter != m.cend()) {
+        dis.insert({ (*m_iter).first, INT_MAX });
+        ++m_iter;
+    }
+
+    // 初始化 distanced 中起点城市的信息
+    auto _dist_iter = dis.find(sc);
+    if (_dist_iter != dis.end()) {
+        (*_dist_iter).second = 0; //起点站费用为零
+    }
+
+
+    for (auto lnd : mp) {
+        if (lnd.second.start_time.getTotalMinute() > st_time) {
+            pq.push({ lnd.second.start_time.getTotalMinute(),0,0,lnd.first });
         }
+    }
 
+    while (!pq.empty()) {
+        int now_state = pq.top().state;
+        int now_cost = pq.top().cost;
+        string line_num = pq.top().line_num;
+        pq.pop();
 
-        for (auto lnd : mp) {
-            if (lnd.second.start_time.getTotalMinute() > st_time) {
-                pq.push({ lnd.second.start_time.getTotalMinute(),0,lnd.first });
-            }
-        }
+        string now_city = mp[line_num].start_city_name, nxt_city = mp[line_num].end_city_name;
 
-        while (!pq.empty()) {
-            int now_time = pq.top().r_time;
-            int now_cost = pq.top().cost;
-            string line_num = pq.top().line_num;
-            pq.pop();
-
-            string now_city = mp[line_num].start_city_name, nxt_city = mp[line_num].end_city_name;
-
-            if (now_time == mp[line_num].start_time.getTotalMinute()) {
-                pq.push({ mp[line_num].end_time.getTotalMinute(),dis[now_city] + mp[line_num].spend_money, line_num });//保存到达时间的价钱
-            }
-            else {
-                pre[nxt_city] = now_city;
-
-                if (nxt_city == ec && now_cost < dis[nxt_city]) {
-                    result = { line_num };
-                    while (now_city != sc) {
-                        result.push_back(pre[now_city]);
-                        now_city = mp[pre[now_city]].start_city_name;
-                    }
-                }
-
-            }
-        }
-
-        if (dis[ec] == INF) {
-            //FindMinCostFail=true;
-            //cout<<"没路"<<endl;
-            QMessageBox::critical(parent,"错误","抱歉，未查询对应路线！");
+        if (now_state == 0) {
+            pq.push({ mp[line_num].end_time.getTotalMinute() + Transit_time, dis[now_city] + mp[line_num].spend_money, 1,line_num });//保存到达时间的价钱
         }
         else {
-            std::reverse(result.begin(), result.end());
-                //for (auto lnd : result) {
-                //cout << mp[lnd].line_number << " " << endl;
-            //}
-            //每次加载数据前清空表格数据
-            if(parent->rowCount()>0){
-                for(int rn=parent->rowCount();rn>=parent->rowCount();--rn){
-                    parent->removeRow(rn);
+            if (nxt_city == ec && now_cost < dis[nxt_city]) {
+                result = { line_num };
+                while (now_city != sc) {
+                    result.push_back(pre[now_city]);
+                    now_city = mp[pre[now_city]].start_city_name;
                 }
             }
 
-            //打印数据
-            parent->setRowCount(result.size());
-            int ri=0;
-            //vector<LineNode>::iterator iter= result.begin();
-            for(auto lnd:result){
-                QString st=QString::number(mp[lnd].start_time.month)+'/'+QString::number(mp[lnd].start_time.day)+'/'+QString::number(mp[lnd].start_time.hour)+'/'+QString::number(mp[lnd].start_time.minute);
-                QString et=QString::number(mp[lnd].end_time.month)+'/'+QString::number(mp[lnd].end_time.day)+'/'+QString::number(mp[lnd].end_time.hour)+'/'+QString::number(mp[lnd].end_time.minute);
-
-                parent->setItem(ri,0,new QTableWidgetItem(QString::fromStdString(mp[lnd].line_number)));
-                parent->setItem(ri,1,new QTableWidgetItem(QString::fromStdString(mp[lnd].start_city_name)));
-                parent->setItem(ri,2,new QTableWidgetItem(QString::fromStdString(mp[lnd].end_city_name)));
-                parent->setItem(ri,3,new QTableWidgetItem(st));
-                parent->setItem(ri,4,new QTableWidgetItem(et));
-                parent->setItem(ri,5,new QTableWidgetItem(mp[lnd].spend_money));
-                ri++;
-            }
-
+            if(now_cost < dis[nxt_city]) pre[nxt_city] = line_num,dis[nxt_city] = now_cost;
 
         }
+    }
 
 
+    if (dis[ec] == INF) {
+        //FindMinCostFail=true;
+        //cout<<"没路"<<endl;
+        QMessageBox::critical(parent,"错误","抱歉，未查询对应路线！");
+    }
+    else {
+        std::reverse(result.begin(), result.end());
+            //for (auto lnd : result) {
+            //cout << mp[lnd].line_number << " " << endl;
+        //}
+        //每次加载数据前清空表格数据
+
+        //打印数据
+        parent->setRowCount(result.size());
+        int ri=0;
+        int CostTime=0;
+        float Money=0;
+        //vector<LineNode>::iterator iter= result.begin();
+        for(auto lnd:result){
+            QString st=QString::number(mp[lnd].start_time.month)+"月"+QString::number(mp[lnd].start_time.day)+"日 "+QString::number(mp[lnd].start_time.hour)+':'+(mp[lnd].start_time.minute<10 ? "0":"")+QString::number(mp[lnd].start_time.minute);
+            QString et=QString::number(mp[lnd].end_time.month)+"月"+QString::number(mp[lnd].end_time.day)+"日 "+QString::number(mp[lnd].end_time.hour)+':'+(mp[lnd].end_time.minute<10 ? "0":"")+QString::number(mp[lnd].end_time.minute);
+
+            parent->setItem(ri,0,new QTableWidgetItem(QString::fromStdString(mp[lnd].line_number)));
+            parent->setItem(ri,1,new QTableWidgetItem(QString::fromStdString(mp[lnd].start_city_name)));
+            parent->setItem(ri,2,new QTableWidgetItem(QString::fromStdString(mp[lnd].end_city_name)));
+            parent->setItem(ri,3,new QTableWidgetItem(st));
+            parent->setItem(ri,4,new QTableWidgetItem(et));
+            parent->setItem(ri,5,new QTableWidgetItem(QString::number(mp[lnd].spend_money), 2));
+            ri++;
+            Money+=mp[lnd].spend_money;
+        }
+        CostTime=mp[result.back()].end_time.getTotalMinute()-mp[result.front()].start_time.getTotalMinute();
+        int tmpday=CostTime/1440;
+        int tmphour=(CostTime-tmpday*1440)/60;
+        int tmpminute=CostTime%60;
+        QString res="该路线 共中转 "+QString::number(ri-1)+" 次，总用时："+QString::number(tmpday)+" 天 "+QString::number(tmphour)+" 小时 "+QString::number(tmpminute)+" 分，总花费 ："+QString::number(Money)+" 元";
+        ResShow->setText(res);
+    }
 
 }
