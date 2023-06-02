@@ -85,7 +85,7 @@ public:
 
     void addCityFromFile(const std::string& FILENAM);  // 从文件读取以添加城市
 
-    void addLine();  //手动添加线路
+    void addLine(const struct LineNode newLineNode);  //手动添加线路
 
     void addLineFromFile(const std::string& FILENAME);  // 从文件读取以添加线路
 

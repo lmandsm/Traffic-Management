@@ -17,8 +17,8 @@
    <widget class="QStackedWidget" name="stackedWidget">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>40</y>
+      <x>20</x>
+      <y>30</y>
       <width>1000</width>
       <height>560</height>
      </rect>
@@ -36,7 +36,7 @@
      </size>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="main_page">
      <property name="minimumSize">
@@ -672,7 +672,7 @@ QPushButton:pressed
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QRadioButton" name="Choose_Plane_radioButton">
+          <widget class="QRadioButton" name="PlaneLineSearch_radioButton">
            <property name="text">
             <string>飞机</string>
            </property>
@@ -692,7 +692,7 @@ QPushButton:pressed
           </spacer>
          </item>
          <item>
-          <widget class="QRadioButton" name="Choose_Train_radioButton">
+          <widget class="QRadioButton" name="TrainLineSearch_radioButton">
            <property name="text">
             <string>火车</string>
            </property>
@@ -701,6 +701,19 @@ QPushButton:pressed
         </layout>
        </item>
       </layout>
+     </widget>
+     <widget class="QLabel" name="Row_label">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>460</y>
+        <width>281</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="CityCheck_page">
@@ -745,8 +758,8 @@ QPushButton:pressed
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>270</x>
-        <y>160</y>
+        <x>90</x>
+        <y>130</y>
         <width>446</width>
         <height>232</height>
        </rect>
@@ -759,26 +772,6 @@ QPushButton:pressed
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
           <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="CitySearch_pushButton">
-           <property name="text">
-            <string>查看</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_6">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -851,6 +844,45 @@ QPushButton:pressed
           </spacer>
          </item>
         </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>100</y>
+        <width>256</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QRadioButton" name="CityPlane_radioButton">
+         <property name="text">
+          <string>飞机</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_8">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="CityTrain_radioButton">
+         <property name="text">
+          <string>火车</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

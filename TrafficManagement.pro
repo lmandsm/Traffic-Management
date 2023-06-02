@@ -1,5 +1,4 @@
 QT       += core gui
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
@@ -13,19 +12,19 @@ SOURCES += \
     cityedit.cpp \
     main.cpp \
     mymain_win.cpp \
-    pathedit.cpp
+    pathadd.cpp
 
 HEADERS += \
     ALGraph.h \
     C:/Users/laomahecx/Documents/Tencent Files/1759440214/FileRecv/ALGraph.h \
     cityedit.h \
     mymain_win.h \
-    pathedit.h
+    pathadd.h
 
 FORMS += \
     cityedit.ui \
     mymain_win.ui \
-    pathedit.ui
+    pathadd.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

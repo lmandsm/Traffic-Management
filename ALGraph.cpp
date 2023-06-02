@@ -119,38 +119,39 @@ void ALGraph::addCityFromFile(const string& FILENAME) {
 
 
 //手动添加线路
-void ALGraph::addLine() {
-    string vehicle;
-    string line_number;
-    Time start_time, end_time;
-    string start_city_name;
-    string end_city_name;
-    //信息输入
-    float spend_money;
-    // 火车或飞机的班次
+void ALGraph::addLine(struct LineNode newLineNode) {
+//    string vehicle;
+//    string line_number;
+//    Time start_time, end_time;
+//    string start_city_name;
+//    string end_city_name;
+//    //信息输入
+//    float spend_money;
+//    // 火车或飞机的班次
 
-    cin >> line_number;
-    cin >> start_city_name;
-    cin >> end_city_name;
-    cin >> spend_money;
+//    cin >> line_number;
+//    cin >> start_city_name;
+//    cin >> end_city_name;
+//    cin >> spend_money;
 
-    if (!check_sc_and_ec(start_city_name, end_city_name)) return;
+    if (!check_sc_and_ec(newLineNode.start_city_name, newLineNode.end_city_name)) return;
 
 
-    if (start_time > end_time) {
-        cout << "出发时间大于到达时间，输入错误，请重新输入！" << endl;
+    if (newLineNode.start_time>newLineNode.end_time) {
+        //cout << "出发时间大于到达时间，输入错误，请重新输入！" << endl;
+        QMessageBox::critical(nullptr,"错误","出发时间大于到达时间，输入错误，请重新输入！");
         return;
     }
 
 
-    auto it = m.find(start_city_name);
-    if (it != m.end() || mp.count(line_number)) {
-        (*it).second.push_back(LineNode(vehicle, line_number, start_city_name, end_city_name, start_time, end_time, spend_money));
-        mp.insert({ line_number,LineNode(vehicle, line_number, start_city_name, end_city_name, start_time, end_time, spend_money) });
-        cout << "添加路线成功！" << endl;
+    auto it = m.find(newLineNode.start_city_name);
+    if (it != m.end() || mp.count(newLineNode.line_number)) {
+        (*it).second.push_back(newLineNode);
+        mp.insert({ newLineNode.line_number,newLineNode });
+        QMessageBox::about(nullptr,"提示","添加线路成功!");
     }
     else {
-        cout << "班次已存在" << endl;
+        QMessageBox::critical(nullptr,"提示","班次已经存在!");
     }
 
 }//addLine
@@ -280,6 +281,8 @@ void ALGraph::showAllLine(QTableWidget *parent) {
             ri++;
         }
     }
+
+
 }  // showAllLine
 
 

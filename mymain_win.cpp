@@ -138,23 +138,26 @@ void MyMain_win::init_Page_PathCheck(){
     //初始化选择查看方式
         //按钮初始化,绑定信号和槽函数
     PathCheckGroupButton=new QButtonGroup(this);
-    PathCheckGroupButton->addButton(ui->Choose_Plane_radioButton,0);
-    PathCheckGroupButton->addButton(ui->Choose_Train_radioButton,1);
+    PathCheckGroupButton->addButton(ui->PlaneLineSearch_radioButton,0);
+    PathCheckGroupButton->addButton(ui->TrainLineSearch_radioButton,1);
     //ui->Choose_Plane_radioButton->setChecked(true);//默认查看飞机航班
     //connect(ui->SearchPath_pushButton,SIGNAL(&QPushButton::click),this,SLOT(on_SearchPath_pushButton_clicked()));//这里的信号不能用SIGNAL(click(bool)),这样会同时执行两次槽函数
-    connect(ui->Choose_Plane_radioButton,SIGNAL(&QPushButton::click),this,SLOT(on_Choose_Plane_radioButton_clicked()));
-    connect(ui->Choose_Train_radioButton,SIGNAL(&QPushButton::click),this,SLOT(on_Choose_Train_radioButton_clicked()));
+    connect(ui->PlaneLineSearch_radioButton,SIGNAL(&QPushButton::click),this,SLOT(on_PlaneLineSearch_radioButton_clicked()));
+    connect(ui->TrainLineSearch_radioButton,SIGNAL(&QPushButton::click),this,SLOT(on_TrainLineSearch_radioButton_clicked()));
 
     //查看表格初始化
-    ui->PathCheck_Table->setColumnCount(6);
+    ui->PathCheck_Table->setColumnCount(8);
         //表格表头：车次，起始站，终点站，出发时间，到站时间，耗时,花销
     QStringList tmpheader;
-    tmpheader<<"班次"<<"起始站"<<"终点站"<<"出发时间"<<"到达时间"<<"旅费";
+    tmpheader<<"班次"<<"起始站"<<"终点站"<<"出发时间"<<"到达时间"<<"旅费"<<"删除"<<"修改";
     ui->PathCheck_Table->setHorizontalHeaderLabels(tmpheader);
     ui->PathCheck_Table->setSelectionBehavior(QAbstractItemView::SelectRows);  //整行选中的方式
-    ui->PathCheck_Table->setEditTriggers(QAbstractItemView::NoEditTriggers);   //禁止修改
+    //ui->PathCheck_Table->setEditTriggers(QAbstractItemView::NoEditTriggers);   //禁止修改
     ui->PathCheck_Table->setSelectionMode(QAbstractItemView::SingleSelection);  //设置为可以选中单个
     ui->PathCheck_Table->verticalHeader()->setVisible(true);   //隐藏列表头
+
+
+
 
 }
 void MyMain_win::init_Page_CityCheck(){
@@ -169,8 +172,11 @@ void MyMain_win::init_Page_CityCheck(){
     ui->CityCheck_Table->setSelectionMode(QAbstractItemView::SingleSelection);  //设置为可以选中单个
     ui->CityCheck_Table->verticalHeader()->setVisible(true);   //隐藏列表头
 
+
+
     //初始化按钮
-    connect(ui->CitySearch_pushButton,SIGNAL(&QPushButton::click),this,SLOT(on_CitySearch_pushButton_clicked()));
+    connect(ui->CityPlane_radioButton,SIGNAL(&QPushButton::click),this,SLOT(on_CityPlane_radioButton_clicked()));
+    connect(ui->CityTrain_radioButton,SIGNAL(&QPushButton::click),this,SLOT(on_CityTrain_radioButton_clicked()));
     connect(ui->City_Add_pushButton,SIGNAL(&QPushButton::click),this,SLOT(on_City_Add_pushButton_clicked()));
 }
 
@@ -251,10 +257,46 @@ void MyMain_win::on_Check_pushButton_clicked()
     }
 }
 
+void MyMain_win::on_PlaneLineSearch_radioButton_clicked()
+{
+    Plane_graph.showAllLine(ui->PathCheck_Table);
+}
 
-void MyMain_win::receiveCityInf(string CityName){
-    Train_graph.addCity(CityName);
-    Plane_graph.addCity(CityName);
+
+void MyMain_win::on_TrainLineSearch_radioButton_clicked()
+{
+    Train_graph.showAllLine(ui->PathCheck_Table);
+}
+
+void MyMain_win::receivePathInf(LineNode tmpPath){
+    if(tmpPath.vehicle=="飞机"){
+        Plane_graph.addLine(tmpPath);
+    }else if(tmpPath.vehicle=="火车"){
+        Train_graph.addLine(tmpPath);
+    }
+}
+void MyMain_win::on_PathCheck_Add_pushButton_clicked()
+{
+    PathAdd *v;
+    v=new PathAdd();
+    v->show();
+    connect(v,SIGNAL(sendPathInf(LineNode)),this,SLOT(receivePathInf(LineNode)));
+}
+void MyMain_win::on_CityPlane_radioButton_clicked()
+{
+    Plane_graph.showAllCity(ui->CityCheck_Table);
+}
+
+
+void MyMain_win::on_CityTrain_radioButton_clicked()
+{
+    Train_graph.showAllCity(ui->CityCheck_Table);
+}
+
+
+void MyMain_win::receiveCityInf(std::string Transportation , std::string CityName){
+    if(Transportation=="飞机")Plane_graph.addCity(CityName);
+    else if(Transportation=="火车")Train_graph.addCity(CityName);
 }
 
 void MyMain_win::on_City_Add_pushButton_clicked()
@@ -262,35 +304,11 @@ void MyMain_win::on_City_Add_pushButton_clicked()
     CityEdit *v;
     v=new CityEdit();
     v->show();
-    connect(v,SIGNAL(sendCityInf(string)),this,SLOT(receiveCityInf(string)));
+    connect(v,SIGNAL(sendCityInf(std::string,std::string)),this,SLOT(receiveCityInf(std::string,std::string)));
 }
-
-
-
-
-
-
 
 void MyMain_win::on_City_Del_pushButton_clicked()
 {
 
-}
-
-
-void MyMain_win::on_Choose_Plane_radioButton_clicked()
-{
-    Plane_graph.showAllLine(ui->PathCheck_Table);
-}
-
-
-void MyMain_win::on_Choose_Train_radioButton_clicked()
-{
-    Train_graph.showAllLine(ui->PathCheck_Table);
-}
-
-
-void MyMain_win::on_CitySearch_pushButton_clicked()
-{
-    Train_graph.showAllCity();
 }
 

@@ -6,6 +6,9 @@ CityEdit::CityEdit(QWidget *parent) :
     ui(new Ui::CityEdit)
 {
     ui->setupUi(this);
+    //交通工具选择
+    ui->Trans_comboBox->addItem("飞机");
+    ui->Trans_comboBox->addItem("火车");
 }
 
 CityEdit::~CityEdit()
@@ -15,10 +18,10 @@ CityEdit::~CityEdit()
 
 void CityEdit::on_CityEdit_Confirm_pushButton_clicked()
 {
-    QString CityName;
-    int dis;
+    QString Transportation, CityName;
+    Transportation=ui->Trans_comboBox->currentText();
     CityName=ui->CityName_lineEdit->text();
-    emit sendCityInf(CityName.toStdString());
+    emit sendCityInf(Transportation.toStdString(),  CityName.toStdString());
     this->close();
 }
 

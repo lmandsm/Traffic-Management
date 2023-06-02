@@ -1,8 +1,9 @@
-﻿#ifndef CITYEDIT_H
+﻿#pragma execution_character_set("utf-8")
+#ifndef CITYEDIT_H
 #define CITYEDIT_H
 
 #include <QWidget>
-
+#include<string>
 namespace Ui {
 class CityEdit;
 }
@@ -21,7 +22,7 @@ private slots:
     void on_CityEdit_Exit_pushButton_clicked();
 
 signals:
-    void sendCityInf(QString);
+    void sendCityInf(std::string ,std::string);
 private:
     Ui::CityEdit *ui;
 };

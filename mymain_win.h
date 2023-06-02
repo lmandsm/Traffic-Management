@@ -14,6 +14,7 @@
 #include<QButtonGroup>
 #include<ALGraph.h>
 #include<cityedit.h>
+#include<pathadd.h>
 
 
 QT_BEGIN_NAMESPACE
@@ -41,14 +42,21 @@ private slots:
     void save_choose_hour();
     void save_choose_min();
     void on_Check_pushButton_clicked();
-    void receiveCityInf(string CityName);
+    void receivePathInf(struct LineNode tmpPath);
+    void receiveCityInf(std::string Transportation, std::string CityName);
     void on_City_Add_pushButton_clicked();
     void on_City_Del_pushButton_clicked();
 
-    void on_Choose_Plane_radioButton_clicked();
-    void on_Choose_Train_radioButton_clicked();
 
-    void on_CitySearch_pushButton_clicked();
+    void on_PlaneLineSearch_radioButton_clicked();
+
+    void on_TrainLineSearch_radioButton_clicked();
+
+    void on_CityPlane_radioButton_clicked();
+
+    void on_CityTrain_radioButton_clicked();
+
+    void on_PathCheck_Add_pushButton_clicked();
 
 private:
     Ui::MyMain_win *ui;
