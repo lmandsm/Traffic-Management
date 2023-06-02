@@ -149,10 +149,10 @@ void MyMain_win::init_Page_PathCheck(){
     connect(ui->TrainLineSearch_radioButton,SIGNAL(&QPushButton::click),this,SLOT(on_TrainLineSearch_radioButton_clicked()));
 
     //查看表格初始化
-    ui->PathCheck_Table->setColumnCount(8);
+    ui->PathCheck_Table->setColumnCount(6);
         //表格表头：车次，起始站，终点站，出发时间，到站时间，耗时,花销
     QStringList tmpheader;
-    tmpheader<<"班次"<<"起始站"<<"终点站"<<"出发时间"<<"到达时间"<<"旅费"<<"删除"<<"修改";
+    tmpheader<<"班次"<<"起始站"<<"终点站"<<"出发时间"<<"到达时间"<<"旅费";
     ui->PathCheck_Table->setHorizontalHeaderLabels(tmpheader);
     ui->PathCheck_Table->setSelectionBehavior(QAbstractItemView::SelectRows);  //整行选中的方式
     //ui->PathCheck_Table->setEditTriggers(QAbstractItemView::NoEditTriggers);   //禁止修改
@@ -286,6 +286,17 @@ void MyMain_win::receivePathInf(LineNode tmpPath){
         Train_graph.addLine(tmpPath);
     }
 }
+void MyMain_win::receivePathMdyInf(struct LineNode tmpPath){
+    if(tmpPath.vehicle=="飞机"){
+        Plane_graph.addLine(tmpPath);
+    }else if(tmpPath.vehicle=="火车"){
+        Train_graph.addLine(tmpPath);
+    }
+    //ui->PathCheck_Table->removeRow(del_line);
+}
+void MyMain_win::receiveIsMdy(bool flag){
+    IsPathMdy=flag;
+}
 void MyMain_win::on_PathCheck_Add_pushButton_clicked()
 {
     PathAdd *v;
@@ -302,13 +313,43 @@ void MyMain_win::on_PathCheck_Del_pushButton_clicked()
         QTableWidgetItem *tmpitem=tmpitems.at(0);
         QString tmpLineNum=tmpitem->text();
         if(ui->TrainLineSearch_radioButton->isChecked()){
-            qDebug()<<"火车的班次为"<<tmpLineNum;
+            //qDebug()<<"火车的班次为"<<tmpLineNum;
             Train_graph.delLine(tmpLineNum.toStdString());
         }else if(ui->PlaneLineSearch_radioButton->isChecked()){
-            qDebug()<<"飞机的班次为"<<tmpLineNum;
+            //qDebug()<<"飞机的班次为"<<tmpLineNum;
             Plane_graph.delLine(tmpLineNum.toStdString());
         }
         ui->PathCheck_Table->removeRow(tmprow);
+
+    }else{
+        QMessageBox::critical(ui->CityCheck_Table,"错误","不存在对应数据,请先选择城市！");
+    }
+}
+void MyMain_win::on_PathCheck_Mdy_pushButton_clicked()
+{
+    QList<QTableWidgetItem*>tmpitems=ui->PathCheck_Table->selectedItems();
+    if(!tmpitems.empty()){
+        //qDebug()<<"选中了第"<<ui->CityCheck_Table->currentRow()<<"行";
+        int tmprow=ui->PathCheck_Table->currentRow();
+        QTableWidgetItem *tmpitem=tmpitems.at(0);
+        QString tmpLineNum=tmpitem->text();
+
+
+        PathModify *v;
+        v=new PathModify();
+        v->show();
+        connect(v,SIGNAL(sendPathMdyInf(LineNode)),this,SLOT(receivePathMdyInf(LineNode)));
+        connect(v,SIGNAL(sendIsMdy(bool)),this,SLOT(receiveIsMdy(bool)));
+        if(IsPathMdy){
+            if(ui->TrainLineSearch_radioButton->isChecked()){
+                //qDebug()<<"火车的班次为"<<tmpLineNum;
+                Train_graph.delLine(tmpLineNum.toStdString());
+
+            }else if(ui->PlaneLineSearch_radioButton->isChecked()){
+                //qDebug()<<"飞机的班次为"<<tmpLineNum;
+                Plane_graph.delLine(tmpLineNum.toStdString());
+            }
+        }
 
     }else{
         QMessageBox::critical(ui->CityCheck_Table,"错误","不存在对应数据,请先选择城市！");
@@ -361,6 +402,9 @@ void MyMain_win::on_City_Del_pushButton_clicked()
     }
 
 }
+
+
+
 
 
 

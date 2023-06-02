@@ -39,7 +39,7 @@
      <string notr="true">#MainWindow{border-image:url(:/resource/mainwindow_bk.jpg)}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="main_page">
      <property name="minimumSize">
@@ -136,7 +136,7 @@ QPushButton:pressed
 </string>
          </property>
          <property name="text">
-          <string>路径选择</string>
+          <string>路径查询</string>
          </property>
         </widget>
        </item>

@@ -12,19 +12,22 @@ SOURCES += \
     cityedit.cpp \
     main.cpp \
     mymain_win.cpp \
-    pathadd.cpp
+    pathadd.cpp \
+    pathmodify.cpp
 
 HEADERS += \
     ALGraph.h \
     C:/Users/laomahecx/Documents/Tencent Files/1759440214/FileRecv/ALGraph.h \
     cityedit.h \
     mymain_win.h \
-    pathadd.h
+    pathadd.h \
+    pathmodify.h
 
 FORMS += \
     cityedit.ui \
     mymain_win.ui \
-    pathadd.ui
+    pathadd.ui \
+    pathmodify.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -40,3 +43,6 @@ DISTFILES += \
     plane_line.txt \
     train_city.txt \
     train_line.txt
+
+RESOURCES += \
+    res.qrc
