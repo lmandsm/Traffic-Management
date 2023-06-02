@@ -227,6 +227,19 @@ QPushButton:pressed
        </item>
       </layout>
      </widget>
+     <widget class="QPushButton" name="SystemExit_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>800</x>
+        <y>420</y>
+        <width>111</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>退出</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="PathChoose_page">
      <property name="minimumSize">

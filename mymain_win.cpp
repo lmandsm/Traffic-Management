@@ -16,6 +16,8 @@ MyMain_win::MyMain_win(QWidget *parent)
     connect(ui->Return_pushButton,&QPushButton::clicked,this,&MyMain_win::switchPage);
     connect(ui->Return_pushButton_2,&QPushButton::clicked,this,&MyMain_win::switchPage);
     connect(ui->Return_pushButton_3,&QPushButton::clicked,this,&MyMain_win::switchPage);
+    //退出按钮
+    connect(ui->SystemExit_pushButton,SIGNAL(&QPushButton::clicked),this,SLOT(on_SystemExit_pushButton_clicked()));
     //初始化三个按钮界面
     init_Page_PathChoose();
     init_Page_PathCheck();
@@ -23,10 +25,11 @@ MyMain_win::MyMain_win(QWidget *parent)
     //导入初始化城市和路径
     Train_graph.addCityFromFile("D:\\App\\Qt\\project\\TrafficManagement\\train_city.txt");
     Train_graph.addLineFromFile("D:\\App\\Qt\\project\\TrafficManagement\\train_line.txt");
+    Plane_graph.addCityFromFile("D:\\App\\Qt\\project\\TrafficManagement\\plane_city.txt");
+    Plane_graph.addLineFromFile("D:\\App\\Qt\\project\\TrafficManagement\\plane_line.txt");
     //初始化中转时间
     Train_graph.Transit_time = 60;
-    //    Plane_graph.addCityFromFile("plane_city.txt");
-    //    Plane_graph.addLineFromFile("plane_city.txt");
+
     Plane_graph.Transit_time = 120;
 
 
@@ -178,8 +181,16 @@ void MyMain_win::init_Page_CityCheck(){
     connect(ui->CityPlane_radioButton,SIGNAL(&QPushButton::click),this,SLOT(on_CityPlane_radioButton_clicked()));
     connect(ui->CityTrain_radioButton,SIGNAL(&QPushButton::click),this,SLOT(on_CityTrain_radioButton_clicked()));
     connect(ui->City_Add_pushButton,SIGNAL(&QPushButton::click),this,SLOT(on_City_Add_pushButton_clicked()));
+    connect(ui->City_Del_pushButton,SIGNAL(&QPushButton::click),this,SLOT(on_City_Del_pushButton_clicked()));
 }
-
+void MyMain_win::on_SystemExit_pushButton_clicked()
+{
+    Plane_graph.saveCity("D:\\App\\Qt\\project\\TrafficManagement\\Plane_city.txt");
+    Plane_graph.saveLine("D:\\App\\Qt\\project\\TrafficManagement\\Plane_line.txt");
+    Train_graph.saveCity("D:\\App\\Qt\\project\\TrafficManagement\\train_city.txt");
+    Train_graph.saveLine("D:\\App\\Qt\\project\\TrafficManagement\\train_line.txt");
+    this->close();
+}
 void MyMain_win::save_transportation()
 {
     choose_transportation=ui->Way_comboBox->currentText();
@@ -282,6 +293,27 @@ void MyMain_win::on_PathCheck_Add_pushButton_clicked()
     v->show();
     connect(v,SIGNAL(sendPathInf(LineNode)),this,SLOT(receivePathInf(LineNode)));
 }
+void MyMain_win::on_PathCheck_Del_pushButton_clicked()
+{
+    QList<QTableWidgetItem*>tmpitems=ui->PathCheck_Table->selectedItems();
+    if(!tmpitems.empty()){
+        //qDebug()<<"选中了第"<<ui->CityCheck_Table->currentRow()<<"行";
+        int tmprow=ui->PathCheck_Table->currentRow();
+        QTableWidgetItem *tmpitem=tmpitems.at(0);
+        QString tmpLineNum=tmpitem->text();
+        if(ui->TrainLineSearch_radioButton->isChecked()){
+            qDebug()<<"火车的班次为"<<tmpLineNum;
+            Train_graph.delLine(tmpLineNum.toStdString());
+        }else if(ui->PlaneLineSearch_radioButton->isChecked()){
+            qDebug()<<"飞机的班次为"<<tmpLineNum;
+            Plane_graph.delLine(tmpLineNum.toStdString());
+        }
+        ui->PathCheck_Table->removeRow(tmprow);
+
+    }else{
+        QMessageBox::critical(ui->CityCheck_Table,"错误","不存在对应数据,请先选择城市！");
+    }
+}
 void MyMain_win::on_CityPlane_radioButton_clicked()
 {
     Plane_graph.showAllCity(ui->CityCheck_Table);
@@ -309,6 +341,30 @@ void MyMain_win::on_City_Add_pushButton_clicked()
 
 void MyMain_win::on_City_Del_pushButton_clicked()
 {
+    QList<QTableWidgetItem*>tmpitems=ui->CityCheck_Table->selectedItems();
+    if(!tmpitems.empty()){
+        //qDebug()<<"选中了第"<<ui->CityCheck_Table->currentRow()<<"行";
+
+        int tmprow=ui->CityCheck_Table->currentRow();
+        QTableWidgetItem *tmpitem=tmpitems.at(0);
+        QString tmpCityName=tmpitem->text();
+        if(ui->CityTrain_radioButton->isChecked()){
+            Train_graph.delCity(tmpCityName.toStdString());
+
+        }else if(ui->CityPlane_radioButton->isChecked()){
+            Plane_graph.delCity(tmpCityName.toStdString());
+        }
+        ui->CityCheck_Table->removeRow(tmprow);
+
+    }else{
+        QMessageBox::critical(ui->CityCheck_Table,"错误","不存在对应数据,请先选择城市！");
+    }
 
 }
+
+
+
+
+
+
 

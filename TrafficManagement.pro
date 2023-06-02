@@ -36,5 +36,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 #}
 
 DISTFILES += \
+    plane_city.txt \
+    plane_line.txt \
     train_city.txt \
     train_line.txt

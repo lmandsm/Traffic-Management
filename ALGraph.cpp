@@ -120,19 +120,6 @@ void ALGraph::addCityFromFile(const string& FILENAME) {
 
 //手动添加线路
 void ALGraph::addLine(struct LineNode newLineNode) {
-//    string vehicle;
-//    string line_number;
-//    Time start_time, end_time;
-//    string start_city_name;
-//    string end_city_name;
-//    //信息输入
-//    float spend_money;
-//    // 火车或飞机的班次
-
-//    cin >> line_number;
-//    cin >> start_city_name;
-//    cin >> end_city_name;
-//    cin >> spend_money;
 
     if (!check_sc_and_ec(newLineNode.start_city_name, newLineNode.end_city_name)) return;
 
@@ -200,29 +187,38 @@ void ALGraph::addLineFromFile(const std::string& FILENAME) {
 void ALGraph::delCity(const string& city_name) {
 
     if (!ifCityExist(city_name)) {
-        cout << city_name << "不存在！请重新输入正确的城市名或者新建该城市！" << endl;
+        qDebug() << "不存在！请重新输入正确的城市名或者新建该城市！" << endl;
         return;
     }
 
-    cout << "正在删除" << city_name << "城市及其相关线路！" << endl;
-
-    // 删除以该城市为起点的线路数据
-    auto key = city_name;
-    auto _it = m.find(key);
-    if (_it != m.end()) {
-        m.erase(key);
+    // 删除以该城市为起点或终点的线路数据
+    for(auto ir = mp.begin(); ir != mp.end(); ir++){
+        if(ir->second.end_city_name == city_name || ir->second.start_city_name == city_name){
+            mp.erase(ir);
+        }
     }
 
-    cout << "已删除" << city_name << "城市及其相关线路！" << endl;
+    auto key = m.find(city_name);
+    m.erase(key);
+
+    // 删除邻接表中到达这条边的数据路线
+    for(auto &city_line : m){
+        for(auto ir = city_line.second.begin(); ir != city_line.second.end(); ir++) {
+            if(ir->end_city_name == city_name) city_line.second.erase(ir);
+        }
+    }
+
+    qDebug() << "删除成功" << endl;
 
 }//delCity
+
 
 
 //删除边
 void ALGraph::delLine(const string& line_number) {
 
     if (!mp.count(line_number)) {
-        cout << "不存在该班次， 请输入正确的班次" << endl;
+        qDebug() << "不存在该班次， 请输入正确的班次" << endl;
         return;
     }
 
@@ -240,6 +236,45 @@ void ALGraph::delLine(const string& line_number) {
     mp.erase(_it);
 }
 
+
+// 将路线保存到文件
+void ALGraph::saveLine(const std::string& FILENAME) {
+   std::ofstream file(FILENAME);
+
+   if (file.is_open()) { // 检查文件是否成功打开
+
+       file<< "交通工具  班次  始发站  终点站  出发时间  到达时间  票价\n";
+       for(auto &lnd : mp){
+           file << lnd.second.vehicle << "  " << lnd.second.line_number << "  " << lnd.second.start_city_name << "  " << lnd.second.end_city_name
+                << " " << lnd.second.start_time.month << " " << lnd.second.start_time.day << " " << lnd.second.start_time.hour << " " << lnd.second.start_time.minute
+                << " " << lnd.second.end_time.month << " " << lnd.second.end_time.day << " " << lnd.second.end_time.hour << " " << lnd.second.end_time.minute
+                << " " << lnd.second.spend_money << "\n";
+         }
+
+       file.close(); // 关闭文件
+       qDebug() << "文本写入成功！" << endl;
+   } else {
+       qDebug() << "无法打开文件！" << endl;
+   }
+}
+
+void ALGraph::saveCity(const std::string& FILENAME) {
+   std::ofstream file(FILENAME);
+
+   if (file.is_open()) { // 检查文件是否成功打开
+
+       file<< "城市\n";
+
+       for(auto city : m){
+           file << city.first << '\n';
+       }
+
+       file.close(); // 关闭文件
+       qDebug() << "文本写入成功！" << endl;
+   } else {
+       qDebug() << "无法打开文件！" << endl;
+   }
+}
 //输出所有城市
 void ALGraph::showAllCity(QTableWidget *parent) {
     if(parent->rowCount()>0){
@@ -622,3 +657,4 @@ void ALGraph::printLeastMoneyPath(QTableWidget *parent, QLabel *ResShow, const s
     }
 
 }
+

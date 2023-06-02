@@ -89,6 +89,10 @@ public:
 
     void addLineFromFile(const std::string& FILENAME);  // 从文件读取以添加线路
 
+    void saveLine(const std::string& FILENAME); // 将路线保存到文件
+
+    void saveCity(const std::string& FILENAME); // 将城市保存到文件
+
     void delLine(const std::string& line_number);// 删除线路，按照班次删除
 
     void delCity(const std::string& city_name);  // 删除城市，并删除以该城市为起点的航班和列车信息

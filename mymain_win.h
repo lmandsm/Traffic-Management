@@ -58,6 +58,10 @@ private slots:
 
     void on_PathCheck_Add_pushButton_clicked();
 
+    void on_PathCheck_Del_pushButton_clicked();
+
+    void on_SystemExit_pushButton_clicked();
+
 private:
     Ui::MyMain_win *ui;
     QString choose_transportation;
