@@ -16,6 +16,7 @@
 #include<cityedit.h>
 #include<pathadd.h>
 #include<pathmodify.h>
+#include<QDir>
 
 
 QT_BEGIN_NAMESPACE
@@ -33,6 +34,7 @@ public:
     void init_Page_PathChoose();
     void init_Page_PathCheck();
     void init_Page_CityCheck();
+
 private slots:
     void save_transportation();
     void save_choose_src();

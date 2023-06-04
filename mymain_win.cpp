@@ -8,6 +8,7 @@ MyMain_win::MyMain_win(QWidget *parent)
 {
     ui->setupUi(this);
 
+
     //界面切换按钮设置
     ui->stackedWidget->setCurrentIndex(0);
     connect(ui->PathChoose_pushButton,&QPushButton::clicked,this,&MyMain_win::switchPage);
@@ -23,10 +24,14 @@ MyMain_win::MyMain_win(QWidget *parent)
     init_Page_PathCheck();
     init_Page_CityCheck();
     //导入初始化城市和路径
-    Train_graph.addCityFromFile("D:\\App\\Qt\\project\\TrafficManagement\\train_city.txt");
-    Train_graph.addLineFromFile("D:\\App\\Qt\\project\\TrafficManagement\\train_line.txt");
-    Plane_graph.addCityFromFile("D:\\App\\Qt\\project\\TrafficManagement\\plane_city.txt");
-    Plane_graph.addLineFromFile("D:\\App\\Qt\\project\\TrafficManagement\\plane_line.txt");
+    Train_graph.addCityFromFile("./train_city.txt");
+    Train_graph.addLineFromFile("./train_line.txt");
+    Plane_graph.addCityFromFile("./plane_city.txt");
+    Plane_graph.addLineFromFile("./plane_line.txt");
+//    Train_graph.addCityFromFile("D:\\App\\Qt\\project\\TrafficManagement\\train_city.txt");
+//    Train_graph.addLineFromFile("D:\\App\\Qt\\project\\TrafficManagement\\train_line.txt");
+//    Plane_graph.addCityFromFile("D:\\App\\Qt\\project\\TrafficManagement\\plane_city.txt");
+//    Plane_graph.addLineFromFile("D:\\App\\Qt\\project\\TrafficManagement\\plane_line.txt");
     //初始化中转时间
     Train_graph.Transit_time = 60;
 
@@ -39,6 +44,7 @@ MyMain_win::~MyMain_win()
 {
     delete ui;
 }
+
 void MyMain_win::switchPage(){
     QPushButton *button=qobject_cast<QPushButton*>(sender());//获取按下按钮的指针
     if(button==ui->PathChoose_pushButton){
@@ -155,14 +161,12 @@ void MyMain_win::init_Page_PathCheck(){
     tmpheader<<"班次"<<"起始站"<<"终点站"<<"出发时间"<<"到达时间"<<"旅费";
     ui->PathCheck_Table->setHorizontalHeaderLabels(tmpheader);
     ui->PathCheck_Table->setSelectionBehavior(QAbstractItemView::SelectRows);  //整行选中的方式
-    //ui->PathCheck_Table->setEditTriggers(QAbstractItemView::NoEditTriggers);   //禁止修改
+    ui->PathCheck_Table->setEditTriggers(QAbstractItemView::NoEditTriggers);   //禁止修改
     ui->PathCheck_Table->setSelectionMode(QAbstractItemView::SingleSelection);  //设置为可以选中单个
     ui->PathCheck_Table->verticalHeader()->setVisible(true);   //隐藏列表头
 
-
-
-
 }
+
 void MyMain_win::init_Page_CityCheck(){
     //查看表格初始化
     ui->CityCheck_Table->setColumnCount(1);
@@ -183,12 +187,13 @@ void MyMain_win::init_Page_CityCheck(){
     connect(ui->City_Add_pushButton,SIGNAL(&QPushButton::click),this,SLOT(on_City_Add_pushButton_clicked()));
     connect(ui->City_Del_pushButton,SIGNAL(&QPushButton::click),this,SLOT(on_City_Del_pushButton_clicked()));
 }
+
 void MyMain_win::on_SystemExit_pushButton_clicked()
 {
-    Plane_graph.saveCity("D:\\App\\Qt\\project\\TrafficManagement\\Plane_city.txt");
-    Plane_graph.saveLine("D:\\App\\Qt\\project\\TrafficManagement\\Plane_line.txt");
-    Train_graph.saveCity("D:\\App\\Qt\\project\\TrafficManagement\\train_city.txt");
-    Train_graph.saveLine("D:\\App\\Qt\\project\\TrafficManagement\\train_line.txt");
+    Plane_graph.saveCity("./Plane_city.txt");
+    Plane_graph.saveLine("./Plane_line.txt");
+    Train_graph.saveCity("./train_city.txt");
+    Train_graph.saveLine("./train_line.txt");
     this->close();
 }
 void MyMain_win::save_transportation()
@@ -402,13 +407,3 @@ void MyMain_win::on_City_Del_pushButton_clicked()
     }
 
 }
-
-
-
-
-
-
-
-
-
-

@@ -1,4 +1,5 @@
-﻿#ifndef ALGRAPH_H
+﻿#pragma execution_character_set("utf-8")
+#ifndef ALGRAPH_H
 #define ALGRAPH_H
 
 #include<iostream>

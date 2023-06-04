@@ -305,7 +305,7 @@ void ALGraph::delCity(const string& city_name) {
         }
     }
 
-    qDebug() << "删除成功" << endl;
+    QMessageBox::about(nullptr,"提示", "删除成功");
 }
 
 //删除边
@@ -329,7 +329,7 @@ void ALGraph::delLine(const string& line_number) {
     auto _it = mp.find(line_number);
     mp.erase(_it);
 
-    qDebug() << "删除成功" << endl;
+    QMessageBox::about(nullptr,"提示","删除成功");
 }
 
 // 将路线保存到文件
@@ -407,7 +407,7 @@ void ALGraph::showAllLine(QTableWidget *parent) {
             parent->setItem(ri,2,new QTableWidgetItem(QString::fromStdString(ir->end_city_name)));
             parent->setItem(ri,3,new QTableWidgetItem(st));
             parent->setItem(ri,4,new QTableWidgetItem(et));
-            parent->setItem(ri,5,new QTableWidgetItem(QString::number(ir->spend_money), 2));
+            parent->setItem(ri,5,new QTableWidgetItem(QString::number(ir->spend_money)));
             ri++;
         }
     }
@@ -472,6 +472,8 @@ void ALGraph::printLeastTimePath(QTableWidget *parent,QLabel *ResShow, const std
         }
     }
 
+
+
     if (reach_time[ec] == INT_MAX) {
         QMessageBox::critical(parent,"错误","抱歉,并未找到对应的路线");
     }
@@ -525,6 +527,8 @@ void ALGraph::printLeastMoneyPath(QTableWidget *parent, QLabel *ResShow, const s
 
     if (!check_sc_and_ec(sc, ec)) {return;}
            //MinCostFail=true;
+
+
     map<string, double> dis; //计入费用
     map<string, string> pre; // 城市 -> 班次
     vector<string> result;  // 存储最终要打印的路径的班次

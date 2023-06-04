@@ -17,8 +17,8 @@
    <widget class="QStackedWidget" name="stackedWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>30</y>
+      <x>30</x>
+      <y>20</y>
       <width>1000</width>
       <height>560</height>
      </rect>
@@ -39,7 +39,7 @@
      <string notr="true">#MainWindow{border-image:url(:/resource/mainwindow_bk.jpg)}</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="main_page">
      <property name="minimumSize">
@@ -136,7 +136,7 @@ QPushButton:pressed
 </string>
          </property>
          <property name="text">
-          <string>路径选择</string>
+          <string>路径查询</string>
          </property>
         </widget>
        </item>
@@ -178,7 +178,7 @@ QPushButton:pressed
 </string>
          </property>
          <property name="text">
-          <string>车次信息</string>
+          <string>路径信息</string>
          </property>
         </widget>
        </item>
@@ -298,8 +298,8 @@ QPushButton:pressed
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>120</x>
-        <y>100</y>
+        <x>80</x>
+        <y>110</y>
         <width>837</width>
         <height>271</height>
        </rect>
@@ -528,22 +528,6 @@ QPushButton:pressed
              </property>
             </widget>
            </item>
-           <item>
-            <spacer name="horizontalSpacer_11">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::MinimumExpanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
           </layout>
          </item>
         </layout>
@@ -603,21 +587,21 @@ QPushButton:pressed
      <widget class="QTableWidget" name="PathCheck_Table">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>100</x>
         <y>130</y>
-        <width>959</width>
+        <width>790</width>
         <height>311</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
-        <width>959</width>
+        <width>790</width>
         <height>311</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>959</width>
+        <width>790</width>
         <height>311</height>
        </size>
       </property>
@@ -625,8 +609,8 @@ QPushButton:pressed
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>700</x>
-        <y>30</y>
+        <x>140</x>
+        <y>100</y>
         <width>69</width>
         <height>20</height>
        </rect>
@@ -638,7 +622,7 @@ QPushButton:pressed
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>350</x>
         <y>450</y>
         <width>292</width>
         <height>31</height>
@@ -671,7 +655,7 @@ QPushButton:pressed
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>450</x>
         <y>100</y>
         <width>213</width>
         <height>30</height>
@@ -711,19 +695,6 @@ QPushButton:pressed
        </item>
       </layout>
      </widget>
-     <widget class="QLabel" name="Row_label">
-      <property name="geometry">
-       <rect>
-        <x>410</x>
-        <y>460</y>
-        <width>281</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
     </widget>
     <widget class="QWidget" name="CityCheck_page">
      <property name="minimumSize">
@@ -741,8 +712,8 @@ QPushButton:pressed
      <widget class="QLabel" name="CityCheck_label">
       <property name="geometry">
        <rect>
-        <x>670</x>
-        <y>30</y>
+        <x>290</x>
+        <y>140</y>
         <width>69</width>
         <height>20</height>
        </rect>
